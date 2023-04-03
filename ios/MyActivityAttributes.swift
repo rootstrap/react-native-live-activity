@@ -7,12 +7,22 @@
 
 import Foundation
 import ActivityKit
+//import MyActivityAttributes
 
-struct MyActivityAttributes: ActivityAttributes {
-    
-    public struct ContentState: Codable, Hashable {
-        var status: String
-        var driverName: String
-        var expectedDeliveryTime: String
-    }
+struct NotificationAttributes: ActivityAttributes {
+  public typealias NotificationStatus = ContentState
+  
+  public struct ContentState: Codable, Hashable {
+    var message: String
+    var deliveryTime: ClosedRange<Date>
+    var items: Int
+    // consider adding a status flag like delivered
+  }
+  
+  var title: String
+  var image: String
+  var scheme: String
+  var amount: String
+  var orderId: String
+  
 }
