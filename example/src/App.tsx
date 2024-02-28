@@ -18,8 +18,8 @@ const App = () => {
 
   const handlerDeepLink = (url: string) => {
     const action = url.replace('liveactivity://', '');
+
     if (action.startsWith('cancel')) {
-      // if (activities?.[0].id) LiveActivity.endNotificationActivity(activities[0].id);
       Alert.alert('Cancel order');
     }
 
@@ -38,8 +38,8 @@ const App = () => {
       .catch((err) => {
         console.warn('An error occurred', err);
       });
+
     Linking.addEventListener('url', ({ url }) => {
-      console.log('url', url);
       if (url) {
         handlerDeepLink(url);
       }

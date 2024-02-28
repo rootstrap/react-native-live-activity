@@ -22,10 +22,8 @@ class LiveActivity: NSObject {
                 
                 do {
                     _ = try Activity.request(attributes: activityAttributes, contentState: initialContentState) // request live activity
-                    print("Requested a notification Live Activity.")
                     resolve("Live Activity requested successfully! app scheme: \(scheme)")
                 } catch (let error) {
-                    print("Error requesting notification delivery Live Activity \(error.localizedDescription).")
                     reject("Error requesting notification to Live Activity", "", error.localizedDescription as? Error)
                 }
             }
@@ -112,30 +110,4 @@ class LiveActivity: NSObject {
             return "defaultscheme"
         }
     }
-    
-    //    @objc(endActivity:withResolver:withRejecter:)
-    //    func endActivity(id: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-    //        if #available(iOS 16.1, *) {
-    //            Task {
-    //                await Activity<MyActivityAttributes>.activities.filter {$0.id == id}.first?.end(dismissalPolicy: .immediate)
-    //            }
-    //        } else {
-    //            reject("Not available","", NSError())
-    //        }
-    //    }
-    //
-    //    @objc(updateActivity:withStatus:withDriverName:withExpectingDeliveryTime:withResolver:withRejecter:)
-    //    func updateActivity(id: String, status: String, driverName: String, expectingDeliveryTime: String, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-    //        if #available(iOS 16.1, *) {
-    //            Task {
-    //                let updatedStatus = MyActivityAttributes
-    //                    .ContentState(status: status, driverName: driverName, expectedDeliveryTime: expectingDeliveryTime)
-    //                let activities = Activity<MyActivityAttributes>.activities
-    //                let activity = activities.filter {$0.id == id}.first
-    //                await activity?.update(using: updatedStatus)
-    //            }
-    //        } else {
-    //            reject("Not available", "", NSError())
-    //        }
-    //    }
 }

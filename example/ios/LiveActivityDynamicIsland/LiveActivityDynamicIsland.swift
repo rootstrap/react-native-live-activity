@@ -1,8 +1,5 @@
 //
 //  LiveActivityDynamicIsland.swift
-//  LiveActivityDynamicIsland
-//
-//  Created by Cristiano Alves on 19/09/2022.
 //
 
 import WidgetKit
