@@ -1,48 +1,13 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules } from 'react-native';
+import type { NotificationActivityParams, UpdateNotificationActivityParams } from './types';
 
-const LINKING_ERROR =
-  `The package 'react-native-live-activity' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo managed workflow\n';
+const { LiveActivity } = NativeModules;
 
-const LiveActivity = NativeModules.LiveActivity
-  ? NativeModules.LiveActivity
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
-export function startActivity(
-  status: string,
-  driverName: string,
-  expectingDeliveryTime: string
-) {
-  return LiveActivity.startActivity(status, driverName, expectingDeliveryTime);
+interface LiveActivityModuleInterface {
+  startNotificationActivity({ title, message, image, amount, items, orderId }: NotificationActivityParams): Promise<void>;
+  updateNotificationActivity({ id, message, title, body, items }: UpdateNotificationActivityParams): Promise<void>;
+  endNotificationActivity(id?: string): Promise<any>;
+  listActivities(): Promise<any>;
 }
 
-export function listAllActivities() {
-  return LiveActivity.listAllActivities();
-}
-
-export function endActivity(id: string) {
-  return LiveActivity.endActivity(id);
-}
-
-export function updateActivity(
-  id: string,
-  status: string,
-  driverName: string,
-  expectingDeliveryTime: string
-) {
-  return LiveActivity.updateActivity(
-    id,
-    status,
-    driverName,
-    expectingDeliveryTime
-  );
-}
+export default LiveActivity as LiveActivityModuleInterface;

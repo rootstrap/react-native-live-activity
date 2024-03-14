@@ -1,23 +1,52 @@
-import * as React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { StyleSheet, View, Text, SafeAreaView, Button } from 'react-native';
 import {
-  startActivity,
-  listAllActivities,
-  endActivity,
-  updateActivity,
-} from 'react-native-live-activity';
+  Alert,
+  Linking,
+  SafeAreaView,
+  Button,
+} from 'react-native';
+import LiveActivity from 'react-native-live-activity';
 import ActivitiesList from './ActivitiesList';
-import Row from './Row';
 
-export default function App() {
-  const [status, setStatus] = React.useState<string>('Packing');
-  const [driver, setDriver] = React.useState<string>('John');
-  const [deliverTime, setDeliveryTime] = React.useState<string>('3pm');
-  const [activities, setActivities] = React.useState<any[]>([]);
-  const [activity, setActivity] = React.useState<any>();
+const App = () => {
+  const [status, setStatus] = useState<string>('Packing');
+  const [driver, setDriver] = useState<string>('John');
+  const [deliverTime, setDeliveryTime] = useState<string>('3pm');
+  const [activities, setActivities] = useState<any[]>([]);
+  const [activity, setActivity] = useState<any>();
 
-  React.useEffect(() => {
+  const handlerDeepLink = (url: string) => {
+    const action = url.replace('liveactivity://', '');
+
+    if (action.startsWith('cancel')) {
+      Alert.alert('Cancel order');
+    }
+
+    if (action.startsWith('call')) {
+      Alert.alert('Calling delivery');
+    }
+  };
+
+  useEffect(() => {
+    Linking.getInitialURL()
+      .then((url) => {
+        if (url) {
+          handlerDeepLink(url);
+        }
+      })
+      .catch((err) => {
+        console.warn('An error occurred', err);
+      });
+
+    Linking.addEventListener('url', ({ url }) => {
+      if (url) {
+        handlerDeepLink(url);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     if (activity) {
       setDriver(activity.driverName);
       setStatus(activity.status);
@@ -25,34 +54,42 @@ export default function App() {
     }
   }, [activity]);
 
-  React.useEffect(() => {
-    listAllActivities().then(setActivities);
+  useEffect(() => {
+    LiveActivity.listActivities().then(setActivities);
   }, [setActivities]);
-  const onPressCreate = React.useCallback(() => {
-    startActivity(status, driver, deliverTime).then(() =>
-      listAllActivities().then(setActivities)
-    );
+
+  const onPressCreate = useCallback(() => {
+    LiveActivity.startNotificationActivity({
+      message: 'Message property',
+      title: 'Order received',
+      amount: '$10.00',
+      items: 1,
+      image: '',
+      orderId: '12345',
+    })
+      .then((result) => {
+        console.log('result: ', result)
+        LiveActivity.listActivities().then(setActivities)
+      })
+      .catch(console.log)
   }, [status, driver, deliverTime]);
 
-  const onPressEdit = React.useCallback(() => {
-    updateActivity(activity.id, status, driver, deliverTime);
+  const onPressEdit = useCallback(() => {
+    LiveActivity.updateNotificationActivity({
+      id: activity.id,
+      title: 'Notification update',
+      body: 'Delivery getting closer',
+      items: 2,
+      message: 'Message property',
+    });
     setActivity(undefined);
   }, [status, driver, deliverTime, activity]);
 
-  const onPressEndActivity = React.useCallback(
+  const onPressEndActivity = useCallback(
     (item) => {
       return () => {
-        endActivity(item.id);
+        LiveActivity.endNotificationActivity(item.id);
         setActivities(activities.filter((value) => value.id !== item.id));
-      };
-    },
-    [activities]
-  );
-
-  const onPressEditActivity = React.useCallback(
-    (item) => {
-      return () => {
-        setActivity(item);
       };
     },
     [activities]
@@ -60,35 +97,18 @@ export default function App() {
 
   return (
     <SafeAreaView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Live Activities React Native</Text>
-        <Row onChangeText={setStatus} label="Status" value={status} />
-        <Row onChangeText={setDriver} label="Driver" value={driver} />
-        <Row
-          onChangeText={setDeliveryTime}
-          label="Delivery Time"
-          value={deliverTime}
-        />
-      </View>
       <Button
-        title={!!activity ? 'Update activity' : 'Create activity'}
-        onPress={!!activity ? onPressEdit : onPressCreate}
+        title={'Create activity'}
+        onPress={onPressCreate}
       />
+      <Button title={'Update activity'} onPress={onPressEdit} />
 
       <ActivitiesList
         activities={activities}
-        onPressEditActivity={onPressEditActivity}
         onPressEndActivity={onPressEndActivity}
       />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  title: { fontSize: 32, fontWeight: 'bold', paddingBottom: 16 },
-  container: {
-    padding: 16,
-  },
-  cell: { flexDirection: 'row', padding: 8, borderBottomWidth: 1 },
-  textInput: { borderWidth: 1, padding: 8 },
-});
+export default App;

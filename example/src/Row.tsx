@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Text, TextInput, View, StyleSheet } from 'react-native';
 
 interface RowProps {
@@ -6,14 +6,6 @@ interface RowProps {
   onChangeText: (value: string) => void;
   value: string;
 }
-
-const styles = StyleSheet.create({
-  textInput: { borderWidth: 1, padding: 8 },
-  container: {
-    paddingBottom: 16,
-  },
-  label: { paddingBottom: 8, fontWeight: 'bold' },
-});
 
 const Row = ({ label, onChangeText, value }: RowProps) => {
   return (
@@ -27,5 +19,13 @@ const Row = ({ label, onChangeText, value }: RowProps) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  textInput: { borderWidth: 1, padding: 8 },
+  container: {
+    paddingBottom: 16,
+  },
+  label: { paddingBottom: 8, fontWeight: 'bold' },
+});
 
 export default Row;
